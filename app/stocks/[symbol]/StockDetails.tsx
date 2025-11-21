@@ -16,6 +16,7 @@ import {
   TableBody,
   Paper,
   GridLegacy as Grid,
+  Avatar,
 } from '@mui/material';
 import {
   CompanyOverview,
@@ -23,6 +24,8 @@ import {
   fetchCompanyOverview,
   fetchDailyTimeSeries,
 } from '../../lib/api';
+import { getLogoUrl } from '@/app/lib/logos';
+import { LineChart } from '@mui/x-charts/LineChart';
 
 type PriceRow = {
   date: string;
@@ -101,6 +104,8 @@ export function StockDetails({ symbol }: Props) {
     };
   }, [symbol]);
 
+  const logo = getLogoUrl(symbol);
+
   if (loading) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" mt={6}>
@@ -121,9 +126,24 @@ export function StockDetails({ symbol }: Props) {
 
   return (
     <Box>
-      <Typography variant="h4" component="h1" gutterBottom>
-        {symbol} – {safeField(overview, 'Name')}
-      </Typography>
+      <Box display="flex" alignItems="center" gap={2} mb={2}>
+        {logo && (
+          <Avatar
+            src={logo}
+            alt={safeField(overview, 'Name')}
+            sx={{ width: 48, height: 48 }}
+            imgProps={{ loading: 'lazy' }}
+          />
+        )}
+        <Box>
+          <Typography variant="h4" component="h1">
+            {symbol} – {safeField(overview, 'Name')}
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            {safeField(overview, 'Exchange')} · {safeField(overview, 'Sector')}
+          </Typography>
+        </Box>
+      </Box>
 
       <Grid container spacing={3}>
         <Grid item xs={12} md={5}>
@@ -192,6 +212,30 @@ export function StockDetails({ symbol }: Props) {
         </Grid>
 
         <Grid item xs={12} md={7}>
+        <Typography variant="h6" gutterBottom>
+            Price History
+          </Typography>
+          <Paper variant="outlined" sx={{ p: 2, mb: 3 }}>
+            <LineChart
+              xAxis={[
+                {
+                  data: prices.map((p) => p.date),
+                  scaleType: 'point',
+                  label: 'Date',
+                  tickMinStep: 5,
+                },
+              ]}
+              series={[
+                {
+                  data: prices.map((p) => p.close),
+                  label: 'Close',
+                },
+              ]}
+              height={250}
+              margin={{ left: 60, right: 20, top: 20, bottom: 40 }}
+            />
+          </Paper>
+
           <Typography variant="h6" gutterBottom>
             Historical Daily Prices
           </Typography>

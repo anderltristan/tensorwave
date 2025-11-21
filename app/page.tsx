@@ -1,5 +1,6 @@
 'use client';
 
+import * as React from 'react';
 import {
   Card,
   CardActionArea,
@@ -7,8 +8,10 @@ import {
   GridLegacy as Grid,
   Typography,
   Box,
+  Avatar,
 } from '@mui/material';
 import Link from 'next/link';
+import { getLogoUrl } from './lib/logos';
 
 type Ticker = {
   symbol: string;
@@ -43,25 +46,40 @@ export default function HomePage() {
         Select a stock to view company overview and daily price history.
       </Typography>
       <Grid container spacing={2} mt={1}>
-        {TICKERS.map((ticker) => (
-          <Grid item xs={12} sm={6} md={4} key={ticker.symbol}>
-            <Card variant="outlined">
-              <Link
-                href={`/stocks/${ticker.symbol}`}
-                style={{ textDecoration: 'none', color: 'inherit' }}
-              >
-                <CardActionArea>
-                  <CardContent>
-                    <Typography variant="h6">{ticker.symbol}</Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {ticker.name}
-                    </Typography>
-                  </CardContent>
-                </CardActionArea>
-              </Link>
-            </Card>
-          </Grid>
-        ))}
+        {TICKERS.map((ticker) => {
+          const logo = getLogoUrl(ticker.symbol);
+          return (
+            <Grid item xs={12} sm={6} md={4} key={ticker.symbol}>
+              <Card variant="outlined">
+                <Link
+                  href={`/stocks/${ticker.symbol}`}
+                  style={{ textDecoration: 'none', color: 'inherit' }}
+                >
+                  <CardActionArea>
+                    <CardContent>
+                      <Box display="flex" alignItems="center" gap={2}>
+                        {logo && (
+                          <Avatar
+                            src={logo}
+                            alt={ticker.name}
+                            sx={{ width: 40, height: 40 }}
+                            imgProps={{ loading: 'lazy' }}
+                          />
+                        )}
+                        <Box>
+                          <Typography variant="h6">{ticker.symbol}</Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            {ticker.name}
+                          </Typography>
+                        </Box>
+                      </Box>
+                    </CardContent>
+                  </CardActionArea>
+                </Link>
+              </Card>
+            </Grid>
+          );
+        })}
       </Grid>
     </Box>
   );
